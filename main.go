@@ -1,9 +1,10 @@
 package main
 
 import (
-	_ "SelectedTranslator/xclip"
+	"SelectedTranslator/xclip"
+	"fmt"
 )
 
 func main() {
-
+	fmt.Println(xclip.GetSelection())
 }

@@ -2,6 +2,8 @@ package xclip
 
 import (
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -26,15 +28,23 @@ func setXclipToLocal() {
 	if err != nil {
 		panic(err.Error())
 	}
+	res, err := http.Get("https://raw.githubusercontent.com/gtoxlili/SelectedTranslator/main/lib/xclip")
+	if err != nil {
+		panic("xclip download failed")
+	}
+	defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+	err = ioutil.WriteFile(filepath.Join(os.Getenv("HOME"), ".xclip", "xclip"), body, 0755)
+	fmt.Println("xclip is set to local")
 }
 
 func init() {
 	if !xclipIsExistPath() && !xclipIsExistLocal() {
-		fmt.Println("xclip is not installed")
+		fmt.Println("xclip is not installed, try to install it")
 		setXclipToLocal()
 	}
 }
 
 func GetSelection() string {
-	return RunShell("./lib/xclip -selection primary -out")
+	return RunShell(filepath.Join(os.Getenv("HOME"), ".xclip", "xclip"), "-selection primary", "-out")
 }
